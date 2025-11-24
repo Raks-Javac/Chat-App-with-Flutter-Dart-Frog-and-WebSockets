@@ -24,6 +24,18 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
       // making sure setstate doesnt rebuild this widget before the widget is fully initialized
       _loadMessages();
       _startWebSocket();
+      _loadMessages();
+    _startWebSocket();
+
+    messageRepository.subscribeToMessageUpdates((messageData) {
+      final message = Message.fromJson(messageData);
+      if (message.chatRoomId == widget.chatRoom.id) {
+        messages.add(message);
+        messages.sort((a, b) => a.createdAt.compareTo(b.createdAt));
+        setState(() {});
+      }
+    });
+      
     });
     super.initState();
   }
