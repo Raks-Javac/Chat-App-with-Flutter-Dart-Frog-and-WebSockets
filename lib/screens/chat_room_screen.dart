@@ -20,16 +20,10 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
 
   @override
   void initState() {
-    _loadMessages();
-    _startWebSocket();
-
-    messageRepository.subscribeToMessageUpdates((messageData) {
-      final message = Message.fromJson(messageData);
-      if (message.chatRoomId == widget.chatRoom.id) {
-        messages.add(message);
-        messages.sort((a, b) => a.createdAt.compareTo(b.createdAt));
-        setState(() {});
-      }
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      // making sure setstate doesnt rebuild this widget before the widget is fully initialized
+      _loadMessages();
+      _startWebSocket();
     });
     super.initState();
   }
@@ -54,12 +48,12 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
   }
 
   _loadMessages() async {
-    final _messages = await messageRepository.fetchMessages(widget.chatRoom.id);
+    final messages = await messageRepository.fetchMessages(widget.chatRoom.id);
 
-    _messages.sort((a, b) => a.createdAt.compareTo(b.createdAt));
+    messages.sort((a, b) => a.createdAt.compareTo(b.createdAt));
 
     setState(() {
-      messages.addAll(_messages);
+      messages.addAll(messages);
     });
   }
 
@@ -102,7 +96,7 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
         actions: [
           IconButton(
             onPressed: () {},
-            icon: Icon(Icons.more_vert),
+            icon: const Icon(Icons.more_vert),
           ),
           const SizedBox(width: 8.0),
         ],
@@ -154,7 +148,7 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
                     onPressed: () {
                       // TODO: Send an image
                     },
-                    icon: Icon(Icons.attach_file),
+                    icon: const Icon(Icons.attach_file),
                   ),
                   Expanded(
                     child: TextFormField(
@@ -174,7 +168,7 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
                           onPressed: () {
                             _sendMessage();
                           },
-                          icon: Icon(Icons.send),
+                          icon: const Icon(Icons.send),
                         ),
                       ),
                     ),
